@@ -4,15 +4,25 @@ import { useEffect, useId, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
 import { GlassButton } from "@/components/ui/GlassButton";
+import { cn } from "@/lib/utils/cn";
 
 type GlassModalProps = {
   open: boolean;
   onClose: () => void;
   title: string;
+  titleAdornment?: React.ReactNode;
+  panelClassName?: string;
   children: React.ReactNode;
 };
 
-export function GlassModal({ open, onClose, title, children }: GlassModalProps) {
+export function GlassModal({
+  open,
+  onClose,
+  title,
+  titleAdornment,
+  panelClassName,
+  children,
+}: GlassModalProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
@@ -63,17 +73,23 @@ export function GlassModal({ open, onClose, title, children }: GlassModalProps) 
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="glass relative w-full max-w-md rounded-[28px] p-6 outline-none"
+            className={cn(
+              "liquid-glass relative w-full max-w-md rounded-[2rem] bg-white/70 p-5 shadow-2xl backdrop-blur-2xl outline-none dark:bg-slate-900/70 sm:p-6",
+              panelClassName,
+            )}
           >
             <div className="mb-4 flex items-center justify-between gap-4">
-              <h2 id={titleId} className="text-lg font-semibold">
-                {title}
-              </h2>
+              <div className="flex min-w-0 items-center gap-2.5">
+                {titleAdornment}
+                <h2 id={titleId} className="truncate text-lg font-semibold">
+                  {title}
+                </h2>
+              </div>
               <GlassButton
                 variant="ghost"
                 aria-label="Close dialog"
                 onClick={onClose}
-                className="h-9 w-9 px-0"
+                className="h-9 w-9 shrink-0 rounded-full border border-white/40 bg-white/35 p-0 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-white/5"
               >
                 <X size={18} />
               </GlassButton>

@@ -32,11 +32,13 @@ function MessageBubbleBase({ message, isStreaming = false }: MessageBubbleProps)
       <div className={cn("min-w-0", isUser ? "max-w-[85%]" : "flex-1")}>
         {isUser ? (
           // Tin nhắn người dùng hiển thị như chữ thuần, không phân tích Markdown
-          <div className="rounded-[22px] rounded-br-lg bg-accent px-4 py-2.5 text-[15px] leading-relaxed break-words whitespace-pre-wrap text-accent-fg">
+          <div className="chat-bubble-user rounded-3xl rounded-br-lg px-4 py-2.5 text-[15px] leading-relaxed break-words whitespace-pre-wrap text-accent-fg">
             {message.content}
           </div>
         ) : (
-          <MarkdownContent content={message.content} isStreaming={isStreaming} />
+          <div className="chat-bubble-assistant">
+            <MarkdownContent content={message.content} isStreaming={isStreaming} />
+          </div>
         )}
 
         {!isStreaming && message.content && (

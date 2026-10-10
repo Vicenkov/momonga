@@ -37,10 +37,10 @@ export function MobileDrawer({ open, onClose, children }: MobileDrawerProps) {
             role="dialog"
             aria-modal="true"
             aria-label="Sidebar"
-            className="glass absolute inset-y-0 left-0 w-[min(20rem,85vw)] rounded-r-[28px] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
-            initial={{ x: "-100%" }}
+            className="liquid-glass absolute inset-y-0 right-0 w-[min(20rem,85vw)] min-w-0 overflow-hidden rounded-l-3xl pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+            initial={{ x: "100%" }}
             animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
+            exit={{ x: "100%" }}
             transition={{ duration: 0.3, ease: "easeOut" }}
           >
             {children}

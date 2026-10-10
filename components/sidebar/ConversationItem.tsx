@@ -6,6 +6,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { GlassButton } from "@/components/ui/GlassButton";
 import { cn } from "@/lib/utils/cn";
 import type { Conversation } from "@/types/chat";
+import { useAppSettings } from "@/hooks/useAppSettings";
 
 type ConversationItemProps = {
   conversation: Conversation;
@@ -22,6 +23,8 @@ export function ConversationItem({
   onRename,
   onRequestDelete,
 }: ConversationItemProps) {
+  const { settings } = useAppSettings();
+  const isVietnamese = settings.language === "vi";
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState("");
   // Ref để Enter/Escape và sự kiện blur không xử lý hai lần
@@ -46,14 +49,14 @@ export function ConversationItem({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
-      className="group relative"
+      className="group relative min-w-0 w-full"
     >
       {isEditing ? (
         <input
           autoFocus
           value={draft}
           maxLength={80}
-          aria-label="Conversation title"
+          aria-label={isVietnamese ? "Tên cuộc trò chuyện" : "Conversation title"}
           onChange={(event) => setDraft(event.target.value)}
           onFocus={(event) => event.target.select()}
           onBlur={() => finishEditing(true)}
@@ -66,7 +69,7 @@ export function ConversationItem({
               finishEditing(false);
             }
           }}
-          className="h-10 w-full rounded-[14px] bg-[var(--glass-highlight)] px-3 text-sm text-fg ring-2 ring-accent outline-none"
+          className="h-10 w-full min-w-0 rounded-[14px] bg-[var(--glass-highlight)] px-3 text-sm text-fg ring-2 ring-accent outline-none"
         />
       ) : (
         <>
@@ -75,20 +78,20 @@ export function ConversationItem({
             onClick={() => onSelect(conversation.id)}
             aria-current={isActive ? "true" : undefined}
             className={cn(
-              "flex h-10 w-full items-center rounded-[14px] px-3 pr-[4.75rem] text-left text-sm transition-colors",
+              "flex h-10 w-full min-w-0 items-center overflow-hidden rounded-[14px] px-3 pr-[76px] text-left text-sm transition-colors",
               "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
               isActive
                 ? "bg-[var(--glass-highlight)] font-medium text-fg"
                 : "text-fg-muted hover:bg-[var(--glass-bg)] hover:text-fg",
             )}
           >
-            <span className="truncate">{conversation.title}</span>
+            <span className="min-w-0 flex-1 truncate">{conversation.title}</span>
           </button>
 
           <div className="reveal-on-hover absolute inset-y-0 right-1 flex items-center">
             <GlassButton
               variant="ghost"
-              aria-label={`Rename ${conversation.title}`}
+              aria-label={isVietnamese ? `Đổi tên ${conversation.title}` : `Rename ${conversation.title}`}
               onClick={startEditing}
               className="h-9 w-9 rounded-[10px] px-0"
             >
@@ -96,7 +99,7 @@ export function ConversationItem({
             </GlassButton>
             <GlassButton
               variant="ghost"
-              aria-label={`Delete ${conversation.title}`}
+              aria-label={isVietnamese ? `Xóa ${conversation.title}` : `Delete ${conversation.title}`}
               onClick={() => onRequestDelete(conversation.id)}
               className="h-9 w-9 rounded-[10px] px-0"
             >

@@ -1,5 +1,7 @@
-import { Menu, PanelLeft, Sparkles } from "lucide-react";
+import Image from "next/image";
+import { Menu, PanelRightClose, PanelRightOpen } from "lucide-react";
 import { GlassButton } from "@/components/ui/GlassButton";
+import { useAppSettings } from "@/hooks/useAppSettings";
 
 type ChatHeaderProps = {
   title: string;
@@ -14,36 +16,48 @@ export function ChatHeader({
   onToggleSidebar,
   onOpenDrawer,
 }: ChatHeaderProps) {
+  const { settings } = useAppSettings();
+  const isVietnamese = settings.language === "vi";
   return (
     <header className="border-b border-[var(--glass-border)] pt-[env(safe-area-inset-top)]">
-      <div className="flex h-14 items-center gap-2 px-3 sm:px-4">
-        {/* Điện thoại và tablet: mở drawer */}
-        <GlassButton
-          variant="ghost"
-          aria-label="Open sidebar"
-          onClick={onOpenDrawer}
-          className="w-11 px-0 lg:hidden"
-        >
-          <Menu size={20} />
-        </GlassButton>
+      <div className="flex h-14 items-center justify-between gap-3 px-3 sm:px-4">
+        <div className="glass inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs text-fg-muted">
+          <Image
+            src="/momonga-coffee.jpg"
+            alt=""
+            width={20}
+            height={20}
+            sizes="20px"
+            className="h-5 w-5 rounded-full object-contain"
+          />
+          Momonga cuti
+        </div>
 
-        {/* Màn hình lớn: thu gọn / mở rộng sidebar */}
-        <GlassButton
-          variant="ghost"
-          aria-label={sidebarCollapsed ? "Show sidebar" : "Hide sidebar"}
-          aria-expanded={!sidebarCollapsed}
-          onClick={onToggleSidebar}
-          className="hidden w-11 px-0 lg:inline-flex"
-        >
-          <PanelLeft size={20} />
-        </GlassButton>
+        <div className="flex min-w-0 items-center justify-end gap-2">
+          <h1 className="min-w-0 truncate text-right text-sm font-medium">
+            {title === "New chat" && isVietnamese ? "Cuộc trò chuyện mới" : title}
+          </h1>
 
-        <h1 className="min-w-0 flex-1 truncate text-sm font-medium">{title}</h1>
+          <GlassButton
+            variant="ghost"
+            aria-label={sidebarCollapsed
+              ? isVietnamese ? "Hiện thanh bên" : "Show sidebar"
+              : isVietnamese ? "Ẩn thanh bên" : "Hide sidebar"}
+            aria-expanded={!sidebarCollapsed}
+            onClick={onToggleSidebar}
+            className="hidden h-9 w-9 shrink-0 px-0 lg:inline-flex"
+          >
+            {sidebarCollapsed ? <PanelRightOpen size={18} /> : <PanelRightClose size={18} />}
+          </GlassButton>
 
-        {/* Tên model đang để tạm, Phase 7 và 11 sẽ lấy từ cấu hình thật */}
-        <div className="glass inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs text-fg-muted">
-          <Sparkles size={14} className="text-accent" />
-          GPT-4o mini
+          <GlassButton
+            variant="ghost"
+            aria-label={isVietnamese ? "Mở danh sách trò chuyện" : "Open sidebar"}
+            onClick={onOpenDrawer}
+            className="h-9 w-9 shrink-0 px-0 lg:hidden"
+          >
+            <Menu size={20} />
+          </GlassButton>
         </div>
       </div>
     </header>

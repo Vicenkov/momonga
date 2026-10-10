@@ -1,12 +1,19 @@
-import { Sparkles } from "lucide-react";
+import Image from "next/image";
 
 export function AssistantAvatar() {
   return (
     <div
       aria-hidden="true"
-      className="glass mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+      className="mt-0.5 h-9 w-9 shrink-0 overflow-hidden rounded-full"
     >
-      <Sparkles size={16} className="text-accent" />
+      <Image
+        src="/momonga-ribbon.jpg"
+        alt=""
+        width={36}
+        height={36}
+        sizes="36px"
+        className="h-full w-full object-cover"
+      />
     </div>
   );
 }

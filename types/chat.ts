@@ -3,6 +3,7 @@ export type Conversation = {
   title: string;
   createdAt: number;
   updatedAt: number;
+  messages: Message[];
 };
 
 export type MessageRole = "user" | "assistant";

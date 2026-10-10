@@ -8,6 +8,7 @@ import {
   Puzzle,
   type LucideIcon,
 } from "lucide-react";
+import { useAppSettings } from "@/hooks/useAppSettings";
 
 type Suggestion = {
   title: string;
@@ -48,6 +49,16 @@ type EmptyStateProps = {
 };
 
 export function EmptyState({ onSelectPrompt }: EmptyStateProps) {
+  const { settings } = useAppSettings();
+  const isVietnamese = settings.language === "vi";
+  const suggestions = isVietnamese
+    ? [
+        { title: "Giải thích một chủ đề", hint: "Diễn giải đơn giản, dễ hiểu", prompt: "Giải thích cách Internet hoạt động bằng ngôn ngữ đơn giản.", icon: Lightbulb },
+        { title: "Soạn nội dung", hint: "Email, bài luận, chú thích", prompt: "Viết email lịch sự xin giáo viên gia hạn thời hạn nộp bài.", icon: PenLine },
+        { title: "Giải quyết vấn đề", hint: "Phân tích từng bước", prompt: "Giúp tôi giải quyết vấn đề này từng bước: ", icon: Puzzle },
+        { title: "Phân tích văn bản", hint: "Tóm tắt hoặc nhận xét nội dung", prompt: "Tóm tắt các ý chính của văn bản sau: ", icon: FileSearch },
+      ]
+    : SUGGESTIONS;
   return (
     <div className="flex h-full flex-col overflow-y-auto p-4 sm:p-6">
       <motion.div
@@ -57,14 +68,16 @@ export function EmptyState({ onSelectPrompt }: EmptyStateProps) {
         className="m-auto w-full max-w-2xl text-center"
       >
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          How can I help you?
+          {isVietnamese ? "Hí lô! Momo cuti đây~" : "Hi there! Momo is here~"}
         </h2>
         <p className="mt-2 text-fg-muted">
-          Ask anything, explore ideas, or get things done.
+          {isVietnamese
+            ? "Hôm nay cậu muốn tớ giúp gì nào? Khen tớ một câu lấy tinh thần nha~ ✨"
+            : "What can I help you with today? A little praise would make my day~ ✨"}
         </p>
 
         <div className="mt-8 grid gap-3 text-left sm:grid-cols-2">
-          {SUGGESTIONS.map(({ title, hint, prompt, icon: Icon }, index) => (
+          {suggestions.map(({ title, hint, prompt, icon: Icon }, index) => (
             <motion.div
               key={title}
               initial={{ opacity: 0, y: 10 }}
@@ -74,7 +87,7 @@ export function EmptyState({ onSelectPrompt }: EmptyStateProps) {
               <button
                 type="button"
                 onClick={() => onSelectPrompt(prompt)}
-                className="glass glass-sheen flex w-full flex-col gap-2 rounded-[24px] p-4 text-left transition-transform duration-200 ease-out hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.98]"
+                className="glass glass-sheen flex w-full flex-col gap-2 rounded-xl p-4 text-left transition-transform duration-200 ease-out hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.98]"
               >
                 <Icon size={20} className="text-accent" />
                 <span className="font-medium">{title}</span>

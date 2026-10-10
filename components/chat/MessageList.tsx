@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowDown } from "lucide-react";
+import { ErrorNotice } from "@/components/chat/ErrorNotice";
 import { MessageBubble } from "@/components/chat/MessageBubble";
 import { TypingIndicator } from "@/components/chat/TypingIndicator";
 import { GlassButton } from "@/components/ui/GlassButton";
@@ -14,9 +15,11 @@ const NEAR_BOTTOM_PX = 80;
 type MessageListProps = {
   messages: Message[];
   status: ChatStatus;
+  error: string | null;
+  onRetry: () => void;
 };
 
-export function MessageList({ messages, status }: MessageListProps) {
+export function MessageList({ messages, status, error, onRetry }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const followBottomRef = useRef(true);
   const lastUserMessageIdRef = useRef<string | null>(null);
@@ -49,7 +52,7 @@ export function MessageList({ messages, status }: MessageListProps) {
     }
 
     if (followBottomRef.current) scrollToBottom("auto");
-  }, [messages, status, scrollToBottom]);
+  }, [messages, status, error, scrollToBottom]);
 
   const handleScrollButtonClick = () => {
     followBottomRef.current = true;
@@ -80,6 +83,7 @@ export function MessageList({ messages, status }: MessageListProps) {
             />
           ))}
           {status === "waiting" && <TypingIndicator />}
+          {error && <ErrorNotice message={error} onRetry={onRetry} />}
         </div>
       </div>
 

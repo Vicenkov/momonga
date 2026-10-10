@@ -2,12 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence } from "motion/react";
-import { Moon, Plus, Search, Sparkles, Sun } from "lucide-react";
+import Image from "next/image";
+import { Plus, Search, Settings } from "lucide-react";
 import { ConversationItem } from "@/components/sidebar/ConversationItem";
 import { GlassButton } from "@/components/ui/GlassButton";
 import { GlassInput } from "@/components/ui/GlassInput";
 import { normalizeForSearch } from "@/lib/utils/text";
 import type { Conversation } from "@/types/chat";
+import { useAppSettings } from "@/hooks/useAppSettings";
 
 type SidebarContentProps = {
   conversations: Conversation[];
@@ -17,6 +19,7 @@ type SidebarContentProps = {
   onSelect: (id: string) => void;
   onRename: (id: string, title: string) => void;
   onRequestDelete: (id: string) => void;
+  onOpenSettings: () => void;
 };
 
 export function SidebarContent({
@@ -27,7 +30,10 @@ export function SidebarContent({
   onSelect,
   onRename,
   onRequestDelete,
+  onOpenSettings,
 }: SidebarContentProps) {
+  const { settings } = useAppSettings();
+  const isVietnamese = settings.language === "vi";
   const [query, setQuery] = useState("");
 
   const visibleConversations = useMemo(() => {
@@ -41,21 +47,34 @@ export function SidebarContent({
   const hasQuery = query.trim() !== "";
 
   return (
-    <div className="flex h-full flex-col gap-4 p-4">
-      <div className="flex items-center justify-between gap-2 pl-2">
-        <div className="flex items-center gap-2 text-lg font-semibold tracking-tight">
-          <Sparkles size={20} className="text-accent" />
-          AI Chat
+    <div className="flex h-full min-w-0 flex-col gap-4 overflow-x-hidden p-4">
+      <div className="flex min-w-0 items-center justify-between gap-2 pl-2">
+        <div className="flex min-w-0 items-center gap-2 text-lg font-semibold tracking-tight">
+          <Image
+            src="/momonga-coffee.jpg"
+            alt=""
+            width={24}
+            height={24}
+            sizes="24px"
+            className="h-6 w-6 shrink-0 rounded-full object-contain"
+          />
+          <span className="truncate">Momonga cuti</span>
         </div>
         {headerAction}
       </div>
 
-      <GlassButton variant="accent" className="w-full" onClick={onNewChat}>
-        <Plus size={18} />
-        New chat
+      <GlassButton
+        variant="accent"
+        className="w-full min-w-0 overflow-hidden"
+        onClick={onNewChat}
+      >
+        <Plus size={18} className="shrink-0" />
+        <span className="min-w-0 truncate">
+          {isVietnamese ? "Cuộc trò chuyện mới" : "New chat"}
+        </span>
       </GlassButton>
 
-      <div className="relative">
+      <div className="relative min-w-0">
         <Search
           size={16}
           aria-hidden="true"
@@ -63,6 +82,7 @@ export function SidebarContent({
         />
         <GlassInput
           data-sidebar-search
+          type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           onKeyDown={(event) => {
@@ -71,19 +91,21 @@ export function SidebarContent({
               setQuery("");
             }
           }}
-          placeholder="Search chats"
-          aria-label="Search conversations"
-          className="h-11 rounded-[18px] pl-10"
+          placeholder={isVietnamese ? "Tìm cuộc trò chuyện" : "Search chats"}
+          aria-label={isVietnamese ? "Tìm cuộc trò chuyện" : "Search conversations"}
+          className="h-11 min-w-0 max-w-full rounded-xl pl-10 pr-3"
         />
       </div>
 
       <nav
-        aria-label="Conversations"
-        className="-mx-1 min-h-0 flex-1 overflow-y-auto px-1"
+        aria-label={isVietnamese ? "Các cuộc trò chuyện" : "Conversations"}
+        className="-mx-1 min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-1"
       >
         {visibleConversations.length === 0 ? (
-          <p className="px-2 text-sm text-fg-muted">
-            {hasQuery ? "No matching conversations." : "No conversations yet."}
+          <p className="min-w-0 break-words px-2 text-sm text-fg-muted">
+            {hasQuery
+              ? isVietnamese ? "Không tìm thấy cuộc trò chuyện." : "No matching conversations."
+              : isVietnamese ? "Chưa có cuộc trò chuyện." : "No conversations yet."}
           </p>
         ) : (
           <ul className="flex flex-col gap-1">
@@ -103,15 +125,14 @@ export function SidebarContent({
         )}
       </nav>
 
-      {/* Nút đổi giao diện tạm thời. Phase 11 sẽ thay bằng Settings. */}
       <GlassButton
         variant="ghost"
-        className="w-full justify-start"
-        onClick={() => document.documentElement.classList.toggle("dark")}
+        className="w-full min-w-0 justify-start overflow-hidden"
+        onClick={onOpenSettings}
+        aria-label={isVietnamese ? "Mở cài đặt" : "Open settings"}
       >
-        <Moon size={18} className="dark:hidden" />
-        <Sun size={18} className="hidden dark:block" />
-        Toggle theme
+        <Settings size={18} />
+        <span className="min-w-0 truncate">{isVietnamese ? "Cài đặt" : "Settings"}</span>
       </GlassButton>
     </div>
   );

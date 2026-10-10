@@ -8,10 +8,19 @@ import {
   Composer,
   type ComposerHandle,
 } from "@/components/chat/Composer";
-import { useFakeChat } from "@/hooks/useFakeChat";
+import { useChat } from "@/hooks/useChat";
+import { useConversations } from "@/hooks/useConversations";
 
 export default function Home() {
-  const { messages, status, send } = useFakeChat();
+  const {
+    conversations,
+    activeConversation,
+    selectConversation,
+    startNewChat,
+    renameConversation,
+    removeConversation,
+  } = useConversations();
+  const { messages, status, error, send, stop, retry } = useChat(activeConversation?.id ?? null);
 
   const [draft, setDraft] = useState("");
 
@@ -25,7 +34,8 @@ export default function Home() {
       return;
     }
 
-    send(content);
+    const targetConversationId = activeConversation?.id ?? startNewChat().id;
+    send(content, targetConversationId);
     setDraft("");
 
     requestAnimationFrame(() => {
@@ -41,24 +51,27 @@ export default function Home() {
     });
   };
 
-  const handleStop = () => {
-    // Phase 6 chỉ chuẩn bị giao diện Stop.
-    // Abort streaming thật sẽ nối ở Phase AI thật.
-  };
-
   const composer = (
     <Composer
       ref={composerRef}
       value={draft}
       onChange={setDraft}
       onSubmit={submit}
-      onStop={handleStop}
+      onStop={stop}
       status={status}
     />
   );
 
   return (
-    <AppShell composer={composer}>
+    <AppShell
+      composer={composer}
+      conversations={conversations}
+      activeConversation={activeConversation}
+      onSelectConversation={selectConversation}
+      onNewChat={startNewChat}
+      onRenameConversation={renameConversation}
+      onDeleteConversation={removeConversation}
+    >
       {messages.length === 0 ? (
         <EmptyState
           onSelectPrompt={handleSelectPrompt}
@@ -67,6 +80,8 @@ export default function Home() {
         <MessageList
           messages={messages}
           status={status}
+          error={error} 
+          onRetry={retry}
         />
       )}
     </AppShell>

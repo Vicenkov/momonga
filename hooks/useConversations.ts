@@ -17,12 +17,14 @@ export function useConversations() {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const activeConversation = useMemo(
-    () => conversations.find((item) => item.id === activeId) ?? null,
+    () => conversations.find((item) => item.id === activeId) ?? conversations[0] ?? null,
     [conversations, activeId],
   );
 
   const startNewChat = useCallback(() => {
-    setActiveId(createConversation().id);
+    const conversation = createConversation();
+    setActiveId(conversation.id);
+    return conversation;
   }, []);
 
   return {

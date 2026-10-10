@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AI Chatbot",
-  description: "A minimal AI chat assistant.",
+  title: "Cloud Club",
+  description: "A cozy pastel AI chat assistant.",
 };
 
 export const viewport: Viewport = {

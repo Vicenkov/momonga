@@ -5,41 +5,114 @@
 
 /* ---------- Bảng màu: chế độ sáng ---------- */
 :root {
-  --bg: #f5f7fa;
-  --fg: #0f172a;
-  --fg-muted: #5b6578;
-  --accent: #3f58f0;
+  --bg: #fbf8fc;
+  --fg: #302b37;
+  --fg-muted: #77717f;
+  --accent: #9672c7;
   --accent-fg: #ffffff;
+  --chat-font-size: 15px;
 
-  --glass-bg: rgba(255, 255, 255, 0.55);
-  --glass-border: rgba(15, 23, 42, 0.08);
-  --glass-highlight: rgba(255, 255, 255, 0.8);
-  --glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
-  --glass-blur: 20px;
+  --glass-bg: rgba(255, 255, 255, 0.48);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-highlight: rgba(255, 255, 255, 0.72);
+  --glass-shadow:
+    0 24px 64px rgba(52, 37, 64, 0.14),
+    0 8px 30px rgba(0, 0, 0, 0.08);
+  --glass-blur: 24px;
 
-  --glow-1: rgba(63, 88, 240, 0.18);
-  --glow-2: rgba(120, 200, 255, 0.16);
+  --glow-1: rgba(246, 190, 211, 0.24);
+  --glow-2: rgba(168, 220, 244, 0.2);
 
   color-scheme: light;
 }
 
 /* ---------- Bảng màu: chế độ tối (khi <html> có class "dark") ---------- */
 .dark {
-  --bg: #08090c;
-  --fg: #f1f3f8;
-  --fg-muted: #9aa3b5;
-  --accent: #8c9eff;
-  --accent-fg: #0b0d14;
+  --bg: #17151d;
+  --fg: #f3eff6;
+  --fg-muted: #b3aaba;
+  --accent: #b89be2;
+  --accent-fg: #21192b;
 
-  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-bg: rgba(15, 23, 42, 0.48);
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-highlight: rgba(255, 255, 255, 0.12);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --glass-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.34),
+    0 8px 30px rgba(0, 0, 0, 0.2);
 
-  --glow-1: rgba(140, 158, 255, 0.14);
-  --glow-2: rgba(90, 200, 255, 0.08);
+  --glow-1: rgba(192, 142, 222, 0.16);
+  --glow-2: rgba(103, 179, 211, 0.1);
 
   color-scheme: dark;
+}
+
+.app-wallpaper {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(rgba(251, 248, 252, 0.12), rgba(251, 248, 252, 0.12)),
+    url("/chiikawa-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.dark .app-wallpaper {
+  background-image:
+    linear-gradient(rgba(23, 21, 29, 0.2), rgba(23, 21, 29, 0.2)),
+    url("/chiikawa-bg.jpg");
+}
+
+.chat-pattern {
+  background-color: transparent;
+  background-image:
+    linear-gradient(rgba(251, 248, 252, 0.68), rgba(251, 248, 252, 0.68)),
+    url("/chiikawa-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.dark .chat-pattern {
+  background-image:
+    linear-gradient(rgba(23, 21, 29, 0.72), rgba(23, 21, 29, 0.72)),
+    url("/chiikawa-bg.jpg");
+}
+
+.chat-bubble-user {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  background: linear-gradient(145deg, #b99be2, #9672c7);
+  box-shadow:
+    0 8px 22px rgba(112, 80, 148, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38);
+}
+
+.dark .chat-bubble-user {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: linear-gradient(145deg, #8a6bb1, #735493);
+}
+
+.chat-bubble-assistant {
+  width: fit-content;
+  max-width: 100%;
+  border: 1px solid var(--glass-border);
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.56);
+  padding: 0.05rem 1rem;
+  box-shadow:
+    0 8px 24px rgba(52, 37, 64, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(18px) saturate(145%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+}
+
+.dark .chat-bubble-assistant {
+  background: rgba(30, 27, 38, 0.68);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09);
 }
 
 /* Đặt tên màu cho Tailwind: dùng được text-fg, bg-accent, text-fg-muted... */
@@ -61,6 +134,7 @@ body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: var(--chat-font-size);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -86,6 +160,24 @@ body::before {
     box-shadow:
       var(--glass-shadow),
       inset 0 1px 0 var(--glass-highlight);
+  }
+
+  .liquid-glass {
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow:
+      var(--glass-shadow),
+      inset 0 1px 0 rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(24px) saturate(155%);
+    -webkit-backdrop-filter: blur(24px) saturate(155%);
+  }
+
+  .dark .liquid-glass {
+    background: rgba(15, 23, 42, 0.4);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow:
+      var(--glass-shadow),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
 
   /* Ánh sáng quét nhẹ khi rê chuột (chỉ trên thiết bị có chuột) */
@@ -217,7 +309,7 @@ body::before {
 
 /* ---------- Markdown trong tin nhắn ---------- */
 .markdown {
-  font-size: 15px;
+  font-size: var(--chat-font-size);
   line-height: 1.7;
   overflow-wrap: anywhere;
 }
@@ -369,6 +461,34 @@ body::before {
 
 .composer-textarea {
   scrollbar-width: thin;
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 12px 32px rgba(52, 37, 64, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+}
+
+.dark .composer-textarea {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(30, 41, 59, 0.6);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+html[data-font-size="small"] {
+  font-size: 14px;
+  --chat-font-size: 13px;
+}
+html[data-font-size="medium"] {
+  font-size: 16px;
+  --chat-font-size: 15px;
+}
+html[data-font-size="large"] {
+  font-size: 18px;
+  --chat-font-size: 18px;
 }
 
 .composer-textarea::-webkit-scrollbar {

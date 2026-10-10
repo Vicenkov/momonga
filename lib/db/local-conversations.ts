@@ -1,5 +1,6 @@
-import type { Conversation } from "@/types/chat";
+import type { Conversation, Message } from "@/types/chat";
 import { createId } from "@/lib/utils/id";
+import { addActivity } from "@/lib/db/local-settings";
 
 const STORAGE_KEY = "chatbot.conversations.v1";
 const MAX_TITLE_LENGTH = 80;
@@ -8,14 +9,27 @@ const EMPTY: Conversation[] = [];
 const listeners = new Set<() => void>();
 let cache: Conversation[] | null = null;
 
-function isConversation(value: unknown): value is Conversation {
+function isMessage(value: unknown): value is Message {
+  if (typeof value !== "object" || value === null) return false;
+  const item = value as Record<string, unknown>;
+  return (
+    typeof item.id === "string" &&
+    typeof item.conversationId === "string" &&
+    (item.role === "user" || item.role === "assistant") &&
+    typeof item.content === "string" &&
+    typeof item.createdAt === "number"
+  );
+}
+
+function isConversation(value: unknown): value is Omit<Conversation, "messages"> & { messages?: unknown } {
   if (typeof value !== "object" || value === null) return false;
   const item = value as Record<string, unknown>;
   return (
     typeof item.id === "string" &&
     typeof item.title === "string" &&
     typeof item.createdAt === "number" &&
-    typeof item.updatedAt === "number"
+    typeof item.updatedAt === "number" &&
+    (item.messages === undefined || (Array.isArray(item.messages) && item.messages.every(isMessage)))
   );
 }
 
@@ -28,7 +42,14 @@ function readFromStorage(): Conversation[] {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return EMPTY;
     const parsed: unknown = JSON.parse(raw);
-    return Array.isArray(parsed) ? sortByRecent(parsed.filter(isConversation)) : EMPTY;
+    return Array.isArray(parsed)
+      ? sortByRecent(
+          parsed.filter(isConversation).map((item) => ({
+            ...item,
+            messages: Array.isArray(item.messages) ? item.messages : [],
+          })),
+        )
+      : EMPTY;
   } catch {
     return EMPTY;
   }
@@ -81,9 +102,34 @@ export function createConversation(): Conversation {
     title: "New chat",
     createdAt: now,
     updatedAt: now,
+    messages: [],
   };
   commit([conversation, ...getSnapshot()]);
+  addActivity("created", conversation.title);
   return conversation;
+}
+
+export function getConversationMessages(id: string): Message[] {
+  return getSnapshot().find((item) => item.id === id)?.messages ?? [];
+}
+
+export function saveConversationMessages(id: string, messages: Message[]) {
+  const firstUserMessage = messages.find((message) => message.role === "user");
+  commit(
+    getSnapshot().map((item) =>
+      item.id === id
+        ? {
+            ...item,
+            messages,
+            title:
+              item.title === "New chat" && firstUserMessage
+                ? firstUserMessage.content.trim().slice(0, MAX_TITLE_LENGTH) || item.title
+                : item.title,
+            updatedAt: Date.now(),
+          }
+        : item,
+    ),
+  );
 }
 
 export function renameConversation(id: string, title: string) {
@@ -94,8 +140,21 @@ export function renameConversation(id: string, title: string) {
       item.id === id ? { ...item, title: trimmed } : item,
     ),
   );
+  addActivity("renamed", trimmed);
 }
 
 export function deleteConversation(id: string) {
+  const conversation = getSnapshot().find((item) => item.id === id);
   commit(getSnapshot().filter((item) => item.id !== id));
+  if (conversation) addActivity("deleted", conversation.title);
+}
+
+export function clearConversations() {
+  commit([]);
+}
+
+export function deleteConversations(ids: string[]) {
+  if (ids.length === 0) return;
+  const selectedIds = new Set(ids);
+  commit(getSnapshot().filter((conversation) => !selectedIds.has(conversation.id)));
 }

@@ -6,14 +6,11 @@ import {
   useImperativeHandle,
   useRef,
 } from "react";
-import {
-  ArrowUp,
-  Mic,
-  Plus,
-  Square,
-} from "lucide-react";
+import { Square } from "lucide-react";
+import Image from "next/image";
 import { GlassButton } from "@/components/ui/GlassButton";
 import { cn } from "@/lib/utils/cn";
+import { useAppSettings } from "@/hooks/useAppSettings";
 import type { ChatStatus } from "@/types/chat";
 
 export type ComposerHandle = {
@@ -43,6 +40,8 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(
     ref,
   ) {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const { settings } = useAppSettings();
+    const isVietnamese = settings.language === "vi";
 
     const isBusy = status !== "idle";
     const canSend = value.trim().length > 0 && !isBusy && !disabled;
@@ -113,17 +112,7 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(
     };
 
     return (
-      <div
-        className={cn(
-  "composer-textarea",
-  "block w-full resize-none bg-transparent",
-  "px-3 pb-12 pt-2.5 pr-3",
-  "text-[15px] leading-6",
-  "outline-none",
-  "placeholder:text-fg-muted",
-  "disabled:cursor-not-allowed disabled:opacity-60",
-)}
-      >
+      <div className="composer-textarea relative w-full rounded-3xl p-3">
         <textarea
           ref={textareaRef}
           value={value}
@@ -132,52 +121,24 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(
           onInput={resizeTextarea}
           disabled={disabled}
           rows={1}
-          placeholder="Message AI..."
-          aria-label="Message"
+          placeholder={isVietnamese ? "Nhắn tin cho AI..." : "Message AI..."}
+          aria-label={isVietnamese ? "Tin nhắn" : "Message"}
           className={cn(
             "block w-full resize-none bg-transparent",
-            "px-3 pb-12 pt-2.5 pr-3",
-            "text-[15px] leading-6",
+            "min-h-10 px-3 py-2",
+            "text-[length:var(--chat-font-size)] leading-6",
             "outline-none",
             "placeholder:text-fg-muted",
             "disabled:cursor-not-allowed disabled:opacity-60",
           )}
         />
 
-        <div className="absolute inset-x-2 bottom-2 flex items-center justify-between">
-          <div className="flex items-center gap-1">
-            <GlassButton
-              type="button"
-              variant="ghost"
-              aria-label="Add attachment"
-              disabled={isBusy}
-              className="h-9 w-9 rounded-full px-0"
-              onClick={() => {
-                // File attachment sẽ được nối ở phase sau.
-              }}
-            >
-              <Plus size={18} />
-            </GlassButton>
-
-            <GlassButton
-              type="button"
-              variant="ghost"
-              aria-label="Voice input"
-              disabled={isBusy}
-              className="h-9 w-9 rounded-full px-0"
-              onClick={() => {
-                // Voice input sẽ được nối ở phase sau.
-              }}
-            >
-              <Mic size={18} />
-            </GlassButton>
-          </div>
-
+        <div className="flex items-center justify-end px-1 pb-1">
           {isBusy ? (
             <GlassButton
               type="button"
               variant="ghost"
-              aria-label="Stop generating"
+              aria-label={isVietnamese ? "Dừng tạo câu trả lời" : "Stop generating"}
               onClick={onStop}
               className="h-9 w-9 rounded-full px-0"
             >
@@ -186,13 +147,20 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(
           ) : (
             <GlassButton
               type="button"
-              variant="accent"
-              aria-label="Send message"
+              variant="ghost"
+              aria-label={isVietnamese ? "Gửi tin nhắn" : "Send message"}
               disabled={!canSend}
               onClick={onSubmit}
-              className="h-9 w-9 rounded-full px-0"
+              className="h-9 w-9 overflow-hidden rounded-full bg-transparent p-0 shadow-none hover:bg-transparent"
             >
-              <ArrowUp size={18} />
+              <Image
+                src="/momonga-avatar.jpg"
+                alt=""
+                width={36}
+                height={36}
+                sizes="36px"
+                className="h-full w-full rounded-full object-cover"
+              />
             </GlassButton>
           )}
         </div>
